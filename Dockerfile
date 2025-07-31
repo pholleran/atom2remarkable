@@ -42,10 +42,11 @@ COPY . .
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Create necessary directories with proper permissions
-RUN mkdir -p output logs templates /root/.config/rmapi && \
+# Create necessary directories with proper permissions for both local and GitHub Actions environments
+RUN mkdir -p output logs templates /root/.config/rmapi /home/app/.config/rmapi && \
     chmod 755 output logs templates && \
-    chmod -R 755 /root/.config
+    chmod -R 755 /root/.config && \
+    chmod -R 755 /home/app/.config
 
 # Set environment variables
 ENV PYTHONPATH=/app
