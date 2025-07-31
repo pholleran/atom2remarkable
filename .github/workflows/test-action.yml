@@ -29,6 +29,4 @@ jobs:
       with:
         recent_hours: ${{ github.event.inputs.recent_hours }}
         feeds_file: 'feeds.txt'
-        remarkable_folder: 'AtomFeeds'
-      env:
-        DEVICE_TOKEN: ${{ secrets.DEVICE_TOKEN }}
+        device_token: ${{ secrets.DEVICE_TOKEN }}

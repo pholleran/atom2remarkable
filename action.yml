@@ -19,6 +19,9 @@ inputs:
     description: 'Folder name in reMarkable Cloud for uploaded PDFs'
     required: false
     default: 'AtomFeeds'
+  device_token:
+    description: 'reMarkable device token for authentication'
+    required: true
 
 outputs:
   pdf_count:
@@ -33,4 +36,4 @@ runs:
     RECENT_HOURS: ${{ inputs.recent_hours }}
     FEEDS_FILE: ${{ inputs.feeds_file }}
     REMARKABLE_FOLDER: ${{ inputs.remarkable_folder }}
-    DEVICE_TOKEN: ${{ secrets.DEVICE_TOKEN }}
+    DEVICE_TOKEN: ${{ inputs.DEVICE_TOKEN }}
