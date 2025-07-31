@@ -36,4 +36,4 @@ runs:
     RECENT_HOURS: ${{ inputs.recent_hours }}
     FEEDS_FILE: ${{ inputs.feeds_file }}
     REMARKABLE_FOLDER: ${{ inputs.remarkable_folder }}
-    DEVICE_TOKEN: ${{ inputs.DEVICE_TOKEN }}
+    DEVICE_TOKEN: ${{ inputs.device_token }}
