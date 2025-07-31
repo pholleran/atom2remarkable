@@ -26,9 +26,6 @@ jobs:
     
     - name: ssh debug
       uses: lhotari/action-upterm@v1
-      with:
-        ## limits ssh access and adds the ssh public key for the user which triggered the workflow
-        ## limits ssh access and adds the ssh public keys of the listed GitHub users
 
     - name: Process Atom Feeds
       uses: ./
