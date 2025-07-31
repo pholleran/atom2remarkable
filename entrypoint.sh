@@ -2,6 +2,9 @@
 
 # rmapi configuration setup
 echo "Setting up rmapi configuration..."
+echo "Environment variables available: $(env | grep -v TOKEN | cut -d '=' -f1 | tr '\n' ' ')"
+echo "DEVICE_TOKEN is set: $(if [ -n "$DEVICE_TOKEN" ]; then echo "YES"; else echo "NO"; fi)"
+echo "DEVICE_TOKEN length: ${#DEVICE_TOKEN} characters"
 
 # Define config file paths (check multiple locations like TOKEN_RETRIEVER.sh)
 CONFIG_PATHS=(
@@ -55,6 +58,11 @@ EOF
         # Ensure proper permissions
         chmod 600 "$config_file"
         echo "rmapi configuration setup completed successfully"
+        
+        # Show config file content without the actual token
+        echo "Config file exists: $(test -f "$config_file" && echo "YES" || echo "NO")"
+        echo "Config file permissions: $(ls -la "$config_file" | awk '{print $1}')"
+        echo "Config file contains devicetoken: $(grep -q "^devicetoken:" "$config_file" && echo "YES" || echo "NO")"
     else
         echo "Warning: DEVICE_TOKEN not set - rmapi authentication may fail"
         return 1
