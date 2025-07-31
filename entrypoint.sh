@@ -33,9 +33,10 @@ setup_rmapi_config() {
     
     # If no config exists, create it in the standard location
     if [[ "$config_exists" == false ]]; then
+        echo "!!! - No existing rmapi config found, creating new one..."
         config_file="/root/.config/rmapi/rmapi.conf"
         mkdir -p "$(dirname "$config_file")"
-        echo "Creating new rmapi config: $config_file"
+        echo "!!! - Creating new rmapi config: $config_file"
     fi
     
     if [[ -n "$DEVICE_TOKEN" ]]; then
