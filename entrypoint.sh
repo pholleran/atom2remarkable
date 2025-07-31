@@ -10,18 +10,43 @@ echo "DEVICE_TOKEN length: ${#DEVICE_TOKEN} characters"
 IS_GITHUB_ACTIONS=$([[ -n "${GITHUB_ACTIONS}" ]] && echo "true" || echo "false")
 echo "Running in GitHub Actions: $IS_GITHUB_ACTIONS"
 
+# First, let's try to determine exactly where rmapi is looking for its config
+echo "Checking where rmapi looks for config..."
+RMAPI_DEBUG_OUTPUT=$(rmapi --debug ls 2>&1 || echo "rmapi debug command failed")
+echo "rmapi debug output: $RMAPI_DEBUG_OUTPUT"
+
+# Extract any config paths mentioned in the debug output
+CONFIG_PATHS_FROM_DEBUG=$(echo "$RMAPI_DEBUG_OUTPUT" | grep -o -E '/(home|root|github)/[^ ]*rmapi[^ ]*' || echo "")
+if [[ -n "$CONFIG_PATHS_FROM_DEBUG" ]]; then
+    echo "Extracted config paths from debug: $CONFIG_PATHS_FROM_DEBUG"
+fi
+
+# Get the current user's home directory
+CURRENT_HOME=$(eval echo ~$(whoami))
+echo "Current user's home directory: $CURRENT_HOME"
+
 # Define config file paths based on environment
 if [[ "$IS_GITHUB_ACTIONS" == "true" ]]; then
-    # GitHub Actions paths - check multiple locations with priority for GitHub Actions paths
+    # GitHub Actions paths - with more possibilities, including what we found from debug
     CONFIG_PATHS=(
-        "/home/app/.config/rmapi/rmapi.conf"
-        "/home/app/.rmapi"
+        # GitHub Actions runner paths
+        "$CURRENT_HOME/.config/rmapi/rmapi.conf"
+        "$CURRENT_HOME/.rmapi"
         "/github/home/.config/rmapi/rmapi.conf"
         "/github/home/.rmapi"
-        "/root/.config/rmapi/rmapi.conf"
+        # Docker user paths
+        "/home/app/.config/rmapi/rmapi.conf"
+        "/home/app/.rmapi"
+        # Root paths
+        "/root/.config/rmapi/rmapi.conf" 
         "/root/.rmapi"
+        # Near binary location
+        "/usr/local/etc/rmapi/rmapi.conf"
+        "/usr/local/etc/rmapi.conf"
+        "/etc/rmapi/rmapi.conf"
+        "/etc/rmapi.conf"
     )
-    DEFAULT_CONFIG_DIR="/home/app/.config/rmapi"
+    DEFAULT_CONFIG_DIR="$CURRENT_HOME/.config/rmapi"
 else
     # Local environment paths
     CONFIG_PATHS=(
@@ -31,6 +56,14 @@ else
         "/home/app/.rmapi"
     )
     DEFAULT_CONFIG_DIR="/root/.config/rmapi"
+fi
+
+# Add any paths we found from debug
+if [[ -n "$CONFIG_PATHS_FROM_DEBUG" ]]; then
+    # Convert newline-separated list to array and add to CONFIG_PATHS
+    while IFS= read -r line; do
+        CONFIG_PATHS+=("$line")
+    done <<< "$CONFIG_PATHS_FROM_DEBUG"
 fi
 
 echo "Config search paths: ${CONFIG_PATHS[*]}"
@@ -54,9 +87,35 @@ setup_rmapi_config() {
     
     # If no config exists, create it in the appropriate standard location
     if [[ "$config_exists" == false ]]; then
+        # Ensure the directory exists
+        mkdir -p "$DEFAULT_CONFIG_DIR" 2>/dev/null || {
+            echo "Failed to create $DEFAULT_CONFIG_DIR, trying alternate locations"
+            # Try alternative locations if the default fails
+            if [[ -w "/root/.config" ]]; then
+                DEFAULT_CONFIG_DIR="/root/.config/rmapi"
+                mkdir -p "$DEFAULT_CONFIG_DIR"
+            elif [[ -w "/home/app" ]]; then
+                DEFAULT_CONFIG_DIR="/home/app/.config/rmapi"
+                mkdir -p "$DEFAULT_CONFIG_DIR"
+            elif [[ -w "/usr/local/etc" ]]; then
+                DEFAULT_CONFIG_DIR="/usr/local/etc/rmapi"
+                mkdir -p "$DEFAULT_CONFIG_DIR"
+            else
+                # Use temp directory as last resort
+                DEFAULT_CONFIG_DIR="/tmp/rmapi"
+                mkdir -p "$DEFAULT_CONFIG_DIR"
+            fi
+        }
+        
         config_file="$DEFAULT_CONFIG_DIR/rmapi.conf"
-        mkdir -p "$(dirname "$config_file")"
         echo "Creating new rmapi config: $config_file"
+        
+        # Verify we can write to this location
+        touch "$config_file" 2>/dev/null || {
+            echo "Cannot write to $config_file, falling back to /tmp"
+            config_file="/tmp/rmapi.conf"
+            touch "$config_file"
+        }
     fi
     
     if [[ -n "$DEVICE_TOKEN" ]]; then
@@ -108,38 +167,66 @@ create_config_symlinks() {
     echo "Creating symlinks for rmapi config files to ensure accessibility..."
     
     # Get the actual config file path that was created/updated
-    local actual_config=$(find /root/.config/rmapi /home/app/.config/rmapi -name "rmapi.conf" -type f 2>/dev/null | head -1)
+    local actual_config=$(find "$DEFAULT_CONFIG_DIR" -name "rmapi.conf" -type f 2>/dev/null | head -1)
     
     if [[ -n "$actual_config" ]]; then
         echo "Found actual config at: $actual_config"
         
-        # Create directory structure for potential symlink targets
-        mkdir -p /root/.config/rmapi
-        mkdir -p /home/app/.config/rmapi
+        # Get a list of all possible config locations
+        local all_possible_locations=(
+            # User home locations
+            "$CURRENT_HOME/.config/rmapi/rmapi.conf"
+            "$CURRENT_HOME/.rmapi"
+            # GitHub Actions runner paths
+            "/github/home/.config/rmapi/rmapi.conf"
+            "/github/home/.rmapi"
+            # Docker user paths
+            "/home/app/.config/rmapi/rmapi.conf"
+            "/home/app/.rmapi"
+            # Root paths
+            "/root/.config/rmapi/rmapi.conf" 
+            "/root/.rmapi"
+            # System-wide config locations
+            "/usr/local/etc/rmapi/rmapi.conf"
+            "/usr/local/etc/rmapi.conf"
+            "/etc/rmapi/rmapi.conf"
+            "/etc/rmapi.conf"
+        )
         
-        # Create symlinks if the target doesn't exist and isn't the actual config
-        if [[ "$actual_config" != "/root/.config/rmapi/rmapi.conf" && ! -e "/root/.config/rmapi/rmapi.conf" ]]; then
-            ln -sf "$actual_config" "/root/.config/rmapi/rmapi.conf"
-            echo "Created symlink: /root/.config/rmapi/rmapi.conf -> $actual_config"
+        # Create symlinks to all possible locations
+        for target in "${all_possible_locations[@]}"; do
+            if [[ "$actual_config" != "$target" && ! -e "$target" ]]; then
+                # Create the directory if needed
+                mkdir -p "$(dirname "$target")" 2>/dev/null || true
+                
+                # Create symlink
+                ln -sf "$actual_config" "$target" 2>/dev/null || echo "Failed to create symlink: $target"
+                echo "Created symlink: $target -> $actual_config"
+            fi
+        done
+        
+        # Make sure everyone can read the config file
+        chmod 644 "$actual_config"
+        echo "Set permissions on $actual_config to ensure readability"
+        
+        # Also create a copy in the current user's home directory
+        mkdir -p "$CURRENT_HOME/.config/rmapi" 2>/dev/null || true
+        if [[ "$actual_config" != "$CURRENT_HOME/.config/rmapi/rmapi.conf" ]]; then
+            cp "$actual_config" "$CURRENT_HOME/.config/rmapi/rmapi.conf" 2>/dev/null || echo "Failed to copy config to $CURRENT_HOME/.config/rmapi/rmapi.conf"
+            echo "Created copy: $CURRENT_HOME/.config/rmapi/rmapi.conf"
         fi
         
-        if [[ "$actual_config" != "/home/app/.config/rmapi/rmapi.conf" && ! -e "/home/app/.config/rmapi/rmapi.conf" ]]; then
-            ln -sf "$actual_config" "/home/app/.config/rmapi/rmapi.conf"
-            echo "Created symlink: /home/app/.config/rmapi/rmapi.conf -> $actual_config"
-        fi
-        
-        # Also link to ~/.rmapi format (old format)
-        if [[ ! -e "/root/.rmapi" ]]; then
-            ln -sf "$actual_config" "/root/.rmapi"
-            echo "Created symlink: /root/.rmapi -> $actual_config"
-        fi
-        
-        if [[ ! -e "/home/app/.rmapi" ]]; then
-            ln -sf "$actual_config" "/home/app/.rmapi"
-            echo "Created symlink: /home/app/.rmapi -> $actual_config"
-        fi
     else
-        echo "Warning: Could not find any rmapi.conf file to create symlinks for"
+        echo "WARNING: Could not find the config file that was just created. This is unexpected."
+        echo "Attempting to find any rmapi.conf file in the system..."
+        
+        # Try to find any config file in the system
+        local found_config=$(find / -name "rmapi.conf" -type f 2>/dev/null | head -1)
+        if [[ -n "$found_config" ]]; then
+            echo "Found a config file at: $found_config"
+        else
+            echo "CRITICAL ERROR: No rmapi.conf file found in the system."
+        fi
     fi
 }
 
