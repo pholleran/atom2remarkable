@@ -465,16 +465,10 @@ class AtomFeedProcessor:
             self.logger.info(
                 f"Uploading {len(generated_pdfs)} PDFs to reMarkable Cloud..."
             )
-            try:
-                upload_results = self.remarkable_uploader.upload_pdfs(generated_pdfs)
-                self.stats['remarkable_uploaded'] = upload_results['uploaded']
-                self.stats['remarkable_skipped'] = upload_results['skipped']
-                self.stats['remarkable_failed'] = upload_results['failed']
-            except Exception as e:
-                self.logger.error(f"Failed to upload PDFs to reMarkable: {e}")
-                self.logger.error("PDF generation was successful, but reMarkable upload failed.")
-                self.stats['remarkable_failed'] = len(generated_pdfs)
-                # Continue execution rather than failing the entire process
+            upload_results = self.remarkable_uploader.upload_pdfs(generated_pdfs)
+            self.stats['remarkable_uploaded'] = upload_results['uploaded']
+            self.stats['remarkable_skipped'] = upload_results['skipped']
+            self.stats['remarkable_failed'] = upload_results['failed']
         
         # Log final statistics
         self.logger.info("=" * 60)
