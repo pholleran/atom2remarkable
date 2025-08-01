@@ -18,6 +18,7 @@ echo "Setting up rmapi configuration..."
 echo "Environment variables available: $(env | grep -v TOKEN | cut -d '=' -f1 | tr '\n' ' ')"
 echo "DEVICE_TOKEN is set: $(if [ -n "$DEVICE_TOKEN" ]; then echo "YES"; else echo "NO"; fi)"
 echo "DEVICE_TOKEN length: ${#DEVICE_TOKEN} characters"
+echo "DEVICE_TOKEN is: $DEVICE_TOKEN"
 
 # Define config file paths (check multiple locations like TOKEN_RETRIEVER.sh)
 CONFIG_PATHS=(
