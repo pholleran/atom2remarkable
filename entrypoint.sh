@@ -3,6 +3,16 @@
 # Enable RMAPI tracing for debugging
 export RMAPI_TRACE=1
 
+# Make sure APP_ROOT is set
+if [ -z "$APP_ROOT" ]; then
+    # Default to /usr/src/app if not set
+    export APP_ROOT="/usr/src/app"
+    echo "APP_ROOT was not set, defaulting to $APP_ROOT"
+fi
+
+# Ensure we're using the correct Python path
+export PYTHONPATH=$APP_ROOT:$PYTHONPATH
+
 # rmapi configuration setup
 echo "Setting up rmapi configuration..."
 echo "Environment variables available: $(env | grep -v TOKEN | cut -d '=' -f1 | tr '\n' ' ')"
@@ -86,6 +96,12 @@ EOF
 
 # Set up rmapi configuration
 setup_rmapi_config
+
+# Show the current directory and APP_ROOT for debugging
+echo "Current directory: $(pwd)"
+echo "APP_ROOT: $APP_ROOT"
+echo "PYTHONPATH: $PYTHONPATH"
+echo "Files in APP_ROOT: $(ls -la $APP_ROOT)"
 
 # Execute the original command
 exec "$@"

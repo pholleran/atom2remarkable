@@ -1,16 +1,20 @@
 import os
+import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
 class Config:
-    # Feed list file
-    FEEDS_FILE = os.getenv('FEEDS_FILE', 'feeds.txt')
+    # Base directory - use environment variable if available
+    APP_ROOT = os.environ.get('APP_ROOT', os.path.dirname(os.path.abspath(__file__)))
     
-    # Output directory for PDFs
-    OUTPUT_DIR = os.getenv('OUTPUT_DIR', 'output')
+    # Feed list file with absolute path
+    FEEDS_FILE = os.getenv('FEEDS_FILE', os.path.join(APP_ROOT, 'feeds.txt'))
     
-    # Log directory
-    LOG_DIR = os.getenv('LOG_DIR', 'logs')
+    # Output directory for PDFs with absolute path
+    OUTPUT_DIR = os.getenv('OUTPUT_DIR', os.path.join(APP_ROOT, 'output'))
+    
+    # Log directory with absolute path
+    LOG_DIR = os.getenv('LOG_DIR', os.path.join(APP_ROOT, 'logs'))
     
     # Time window for recent entries (24 hours)
     RECENT_HOURS = int(os.getenv('RECENT_HOURS', '24'))
@@ -23,9 +27,9 @@ class Config:
     MAX_IMAGE_WIDTH = int(os.getenv('MAX_IMAGE_WIDTH', '400'))  # pixels
     PDF_FONT_SIZE = int(os.getenv('PDF_FONT_SIZE', '13'))  # base font size
     
-    # Template settings
-    TEMPLATE_DIR = 'templates'
-    CSS_FILE = 'templates/style.css'
+    # Template settings with absolute paths
+    TEMPLATE_DIR = os.getenv('TEMPLATE_DIR', os.path.join(APP_ROOT, 'templates'))
+    CSS_FILE = os.getenv('CSS_FILE', os.path.join(APP_ROOT, 'templates', 'style.css'))
     
     # Date format for filenames and logs
     DATE_FORMAT = '%Y-%m-%d_%H-%M-%S'
@@ -78,6 +82,29 @@ class Config:
     @staticmethod
     def setup_directories():
         """Create necessary directories"""
+        # Print debugging info
+        print(f"Setting up directories with APP_ROOT: {Config.APP_ROOT}")
+        print(f"OUTPUT_DIR: {Config.OUTPUT_DIR}")
+        print(f"LOG_DIR: {Config.LOG_DIR}")
+        print(f"TEMPLATE_DIR: {Config.TEMPLATE_DIR}")
+        
+        # Create directories
         Path(Config.OUTPUT_DIR).mkdir(exist_ok=True)
         Path(Config.LOG_DIR).mkdir(exist_ok=True)
-        Path(Config.TEMPLATE_DIR).mkdir(exist_ok=True)
+        
+        # Verify template directory exists but don't create it
+        # as it should be included in the Docker image
+        if not os.path.exists(Config.TEMPLATE_DIR):
+            print(f"WARNING: Template directory not found at {Config.TEMPLATE_DIR}")
+            # Try to locate it
+            potential_paths = [
+                os.path.join(Config.APP_ROOT, 'templates'),
+                '/usr/src/app/templates',
+                '/templates'
+            ]
+            for path in potential_paths:
+                if os.path.exists(path):
+                    print(f"Found templates at: {path}")
+                    Config.TEMPLATE_DIR = path
+                    Config.CSS_FILE = os.path.join(path, 'style.css')
+                    break
