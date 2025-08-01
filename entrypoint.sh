@@ -14,6 +14,7 @@ CONFIG_PATHS=(
     "/root/.rmapi"
     "/root/.config/rmapi/rmapi.conf"
     "/home/app/.config/rmapi/rmapi.conf"
+    "/home/runner/.config/rmapi/rmapi.conf"
 )
 
 # Function to update or create rmapi config
