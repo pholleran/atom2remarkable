@@ -24,8 +24,8 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
     
-    # - name: ssh debug
-    #  uses: mxschmitt/action-tmate@v3
+    - name: ssh debug
+      uses: mxschmitt/action-tmate@v3
 
     - name: Process Atom Feeds
       uses: ./
