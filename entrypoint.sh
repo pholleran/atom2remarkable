@@ -32,10 +32,19 @@ setup_rmapi_config() {
         fi
     done
     
-    # If no config exists, create it in the standard location
+    # If no config exists, create it in the appropriate location based on environment
     if [[ "$config_exists" == false ]]; then
         echo "!!! - No existing rmapi config found, creating new one..."
-        config_file="/root/.config/rmapi/rmapi.conf"
+        
+        # Check if running in GitHub Actions using official environment variable
+        if [[ -n "$GITHUB_ACTIONS" || -n "$GITHUB_WORKFLOW" ]]; then
+            config_file="/home/runner/.config/rmapi/rmapi.conf"
+            echo "!!! - Detected GitHub Actions environment (via env vars)"
+        else
+            config_file="/root/.config/rmapi/rmapi.conf"
+            echo "!!! - Using default environment"
+        fi
+        
         mkdir -p "$(dirname "$config_file")"
         echo "!!! - Creating new rmapi config: $config_file"
     fi
