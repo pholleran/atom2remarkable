@@ -41,16 +41,11 @@ RUN chmod +x /entrypoint.sh
 
 # Create necessary directories with proper permissions for all possible config locations
 RUN mkdir -p /usr/src/app/output /usr/src/app/logs /usr/src/app/templates \
-    /root/.config/rmapi \
     /home/runner/.config/rmapi \
     /etc/rmapi && \
-    chmod 777 /usr/src/app/output /usr/src/app/logs /usr/src/app/templates && \
-    chmod -R 777 /root/.config && \
-    chmod -R 777 /home/runner/.config 2>/dev/null || true && \
-    chmod -R 777 /etc/rmapi
-
-# Create backup directories for config files
-RUN mkdir -p /tmp/rmapi && chmod 777 /tmp/rmapi
+    chmod 755 /usr/src/app/output /usr/src/app/logs /usr/src/app/templates && \
+    chmod -R 755 /home/runner/.config 2>/dev/null || true && \
+    chmod -R 755 /etc/rmapi
 
 # Set environment variables with absolute paths
 ENV PYTHONPATH=/usr/src/app
@@ -60,9 +55,6 @@ ENV LOG_DIR=/usr/src/app/logs
 ENV FEEDS_FILE=/usr/src/app/feeds.txt
 ENV RECENT_HOURS=24
 ENV REMARKABLE_FOLDER=AtomFeeds
-
-# Ensure the container can write to these directories
-RUN chmod -R 755 /usr/src/app/output /usr/src/app/logs
 
 # Set entrypoint
 ENTRYPOINT ["/entrypoint.sh"]

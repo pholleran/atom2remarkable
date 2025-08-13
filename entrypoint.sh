@@ -19,15 +19,6 @@ echo "Checking for a DEVICE_TOKEN"
 echo "...DEVICE_TOKEN is set: $(if [ -n "$DEVICE_TOKEN" ]; then echo "YES"; else echo "NO"; fi)"
 echo "...DEVICE_TOKEN length: ${#DEVICE_TOKEN} characters"
 
-
-# Define config file paths (check multiple locations like TOKEN_RETRIEVER.sh)
-CONFIG_PATHS=(
-    "/root/.rmapi"
-    "/root/.config/rmapi/rmapi.conf"
-    "/home/app/.config/rmapi/rmapi.conf"
-    "/home/runner/.config/rmapi/rmapi.conf"
-)
-
 # Function to create rmapi config
 setup_rmapi_config() {
     local config_file=""
@@ -36,13 +27,8 @@ setup_rmapi_config() {
     echo "Setting up rmapi configuration file..."
 
     # Determine the appropriate location for the config file based on environment
-    if [[ -n "$GITHUB_ACTIONS" || -n "$GITHUB_WORKFLOW" ]]; then
-        config_file="$HOME/.config/rmapi/rmapi.conf"
-        echo "...Detected GitHub Actions environment (via env vars)"
-    else
-        config_file="/root/.config/rmapi/rmapi.conf"
-        echo "...Using default environment"
-    fi
+    config_file="$HOME/.config/rmapi/rmapi.conf"
+    echo "...Using default environment"
     
     # Ensure the directory exists
     mkdir -p "$(dirname "$config_file")"
