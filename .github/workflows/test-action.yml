@@ -27,6 +27,6 @@ jobs:
     - name: Process Atom Feeds
       uses: ./
       with:
-        recent_hours: ${{ github.event.inputs.recent_hours }}
+        recent_hours: ${{ github.event.inputs.recent_hours || '24' }}
         feeds_file: 'feeds.txt'
         device_token: ${{ secrets.DEVICE_TOKEN }}
