@@ -81,7 +81,7 @@ EOF
         fi
         
         # Ensure proper permissions
-        chmod 600 "$config_file"
+        chmod 644 "$config_file"
         echo "rmapi configuration setup completed successfully"
         
         # Show config file content without the actual token
