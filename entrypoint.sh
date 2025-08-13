@@ -50,16 +50,22 @@ setup_rmapi_config() {
     
     if [[ -n "$DEVICE_TOKEN" ]]; then
         # Always create a new config file with the device token and preserved usertoken
-        cat > "$config_file" << EOF
-devicetoken: $DEVICE_TOKEN
-usertoken: $usertoken
-EOF
+        # cat > "$config_file" << EOF
+# devicetoken: $DEVICE_TOKEN
+# usertoken: $usertoken
+# EOF
+        printf "devicetoken: %s\nusertoken: %s\n" "$DEVICE_TOKEN" "$usertoken" > "$config_file"
         echo "...Created new rmapi config with devicetoken"
         
         # Ensure proper permissions
         chmod 644 "$config_file"
         echo "...rmapi configuration setup completed successfully"
-        
+
+        # check rmapi executable
+        echo "rmapi path and permission:"
+        echo "...which rmapi: $(which rmapi 2>/dev/null || echo "rmapi not found in PATH")"
+        echo "...$(ls -la $(which rmapi 2>/dev/null) 2>/dev/null || echo "rmapi not found in PATH")"
+
         # Show config file content without the actual token
         echo "Config file exists: $(test -f "$config_file" && echo "YES" || echo "NO")"
         echo "Config file permissions: $(ls -la "$config_file")"
