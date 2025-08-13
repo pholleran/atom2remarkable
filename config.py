@@ -82,11 +82,6 @@ class Config:
     @staticmethod
     def setup_directories():
         """Create necessary directories"""
-        # Print debugging info
-        print(f"Setting up directories with APP_ROOT: {Config.APP_ROOT}")
-        print(f"OUTPUT_DIR: {Config.OUTPUT_DIR}")
-        print(f"LOG_DIR: {Config.LOG_DIR}")
-        print(f"TEMPLATE_DIR: {Config.TEMPLATE_DIR}")
         
         # Create directories
         Path(Config.OUTPUT_DIR).mkdir(exist_ok=True)
