@@ -37,7 +37,7 @@ setup_rmapi_config() {
 
     # Determine the appropriate location for the config file based on environment
     if [[ -n "$GITHUB_ACTIONS" || -n "$GITHUB_WORKFLOW" ]]; then
-        config_file="/home/runner/.config/rmapi/rmapi.conf"
+        config_file="$HOME/.config/rmapi/rmapi.conf"
         echo "...Detected GitHub Actions environment (via env vars)"
     else
         config_file="/root/.config/rmapi/rmapi.conf"
@@ -50,11 +50,10 @@ setup_rmapi_config() {
     
     if [[ -n "$DEVICE_TOKEN" ]]; then
         # Always create a new config file with the device token and preserved usertoken
-        # cat > "$config_file" << EOF
-# devicetoken: $DEVICE_TOKEN
-# usertoken: $usertoken
-# EOF
-        printf "devicetoken: %s\nusertoken: %s\n" "$DEVICE_TOKEN" "$usertoken" > "$config_file"
+        cat > "$config_file" << EOF
+devicetoken: $DEVICE_TOKEN
+usertoken: $usertoken
+EOF
         echo "...Created new rmapi config with devicetoken"
         
         # Ensure proper permissions
