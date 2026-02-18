@@ -12,11 +12,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Run the application
 python main.py
 
-# Run tests
+# Run unit tests (no external services required)
+pytest tests/ -v
+
+# Run a single test file
+pytest tests/test_processor.py -v
+
+# Run integration tests (requires live rmapi + reMarkable credentials)
 python test.py
 
 # Install dependencies
 pip install -r requirements.txt
+pip install -r requirements-dev.txt  # test dependencies
 
 # Docker
 docker build -t atom2remarkable .
@@ -38,8 +45,9 @@ docker run --rm --env-file .env atom2remarkable
 - `remarkable.py` — `RemarkableUploader` class; wraps `rmapi` subprocess calls
 - `config.py` — All configuration with ENV var overrides
 - `templates/` — Jinja2 HTML template and e-reader CSS
-- `.github/workflows/test-action.yml` — Scheduled GitHub Actions workflow
+- `.github/workflows/ci.yml` — CI workflow (runs pytest on push/PR)
 - `action.yml` — Docker-based GitHub Action definition
+- `tests/` — pytest unit tests (no external services required)
 
 **Configuration (ENV vars override defaults):**
 - `RECENT_HOURS` — Lookback window (default: 24)
