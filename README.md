@@ -10,20 +10,24 @@ The easiest way to use atom2reMarkable is to create a small private repo that ho
 
 **1. Get your reMarkable device token**
 
-You'll need to authenticate with reMarkable Cloud once to get a device token:
+You'll need to authenticate with reMarkable Cloud once to get a device token. Clone this repo temporarily to access the helper script:
 
 ```bash
+# Clone this repo
+git clone https://github.com/pholleran/atom2remarkable.git
+cd atom2remarkable
+
 # Install rmapi (macOS)
 brew install rmapi
 
-# Run it once — it will prompt you to log in via a one-time code
+# Authenticate with reMarkable Cloud — this will prompt you to log in via a one-time code
 rmapi
 
-# Extract the device token
+# Once authenticated, extract your device token
 ./TOKEN_RETRIEVER.sh
 ```
 
-Save the token somewhere safe — you'll add it as a secret in the next step.
+Save the token somewhere safe — you'll add it as a secret in the next step. You can delete the cloned repo once you have it.
 
 **2. Create a private config repo**
 
