@@ -52,6 +52,10 @@ docker run --rm --env-file .env atom2remarkable
 
 **Exit codes:** `0` = success, `1` = all PDFs failed, `2` = partial failures.
 
+## Git Workflow
+
+Always create a new branch before making code changes. Never commit directly to `main`.
+
 ## External Dependencies
 
 - `rmapi` binary — must be installed separately for local uploads (auto-downloaded in Docker)
