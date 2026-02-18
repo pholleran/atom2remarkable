@@ -47,6 +47,12 @@ on:
   schedule:
     - cron: '0 6 * * *'  # Daily at 6 AM UTC
   workflow_dispatch:
+    inputs:
+      recent_hours:
+        description: 'Hours to look back for recent entries'
+        required: false
+        default: '24'
+        type: string
 
 jobs:
   process-feeds:
@@ -56,6 +62,7 @@ jobs:
     - uses: pholleran/atom2remarkable@main
       with:
         device_token: ${{ secrets.DEVICE_TOKEN }}
+        recent_hours: ${{ github.event.inputs.recent_hours || '24' }}
 ```
 
 **3. Add your device token as a secret**
