@@ -61,3 +61,25 @@ class TestGetCutoffTime:
             expected = datetime.now() - timedelta(hours=48)
             # Allow 1 second of tolerance
             assert abs((cutoff - expected).total_seconds()) < 1
+
+
+class TestSetupDirectories:
+    def test_creates_output_and_log_dirs(self, tmp_path):
+        with patch.object(Config, 'OUTPUT_DIR', str(tmp_path / "output")), \
+             patch.object(Config, 'LOG_DIR', str(tmp_path / "logs")), \
+             patch.object(Config, 'TEMPLATE_DIR', str(tmp_path / "templates")):
+            (tmp_path / "templates").mkdir()  # Templates dir exists
+            Config.setup_directories()
+            assert (tmp_path / "output").exists()
+            assert (tmp_path / "logs").exists()
+
+    def test_finds_fallback_template_dir(self, tmp_path):
+        fallback = tmp_path / "templates"
+        fallback.mkdir()
+
+        with patch.object(Config, 'OUTPUT_DIR', str(tmp_path / "output")), \
+             patch.object(Config, 'LOG_DIR', str(tmp_path / "logs")), \
+             patch.object(Config, 'TEMPLATE_DIR', str(tmp_path / "nonexistent")), \
+             patch.object(Config, 'APP_ROOT', str(tmp_path)):
+            Config.setup_directories()
+            assert Config.TEMPLATE_DIR == str(fallback)
