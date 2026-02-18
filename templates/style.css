@@ -1,0 +1,166 @@
+/* RemarkableAtom PDF Styles - Optimized for E-Readers */
+
+@page {
+    size: A4;
+    margin: 0.375in;
+    @bottom-center {
+        content: counter(page);
+        font-size: 10px;
+        color: #666;
+    }
+}
+
+/* E-Reader optimization: avoid very small text */
+body {
+    font-family: 'Georgia', serif;
+    line-height: 1.5;  /* Slightly tighter line spacing */
+    color: #333;
+    font-size: 13px;  /* Configurable base font for E-Reader readability */
+}
+
+h1 {
+    color: #2c3e50;
+    border-bottom: 3px solid #3498db;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+    font-size: 24px;
+    page-break-after: avoid;
+}
+
+h2, h3, h4, h5, h6 {
+    color: #34495e;
+    margin-top: 25px;
+    page-break-after: avoid;
+}
+
+h2 { font-size: 18px; }
+h3 { font-size: 16px; }
+h4 { font-size: 14px; }
+
+.metadata {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-left: 5px solid #3498db;
+    margin-bottom: 30px;
+    font-size: 11px;
+    page-break-inside: avoid;
+}
+
+.metadata p {
+    margin: 5px 0;
+}
+
+.content {
+    text-align: justify;
+    orphans: 3;
+    widows: 3;
+}
+
+.content p {
+    margin-bottom: 12px;
+}
+
+img {
+    max-width: 400px;  /* Maximum width for E-Reader compatibility */
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 10px auto;
+    page-break-inside: avoid;
+    border: 1px solid #ddd;  /* Light border for better E-Reader visibility */
+}
+
+/* For very large images, ensure they don't exceed page width */
+.content img {
+    max-width: min(400px, 100%);
+}
+
+/* Handle figure elements that might contain images */
+figure {
+    max-width: 400px;
+    margin: 15px auto;
+    text-align: center;
+    page-break-inside: avoid;
+}
+
+figure img {
+    margin: 0;
+}
+
+figcaption {
+    font-size: 10px;
+    color: #666;
+    font-style: italic;
+    margin-top: 5px;
+    text-align: center;
+}
+
+blockquote {
+    border-left: 4px solid #bdc3c7;
+    padding-left: 20px;
+    margin: 20px 0;
+    font-style: italic;
+    color: #7f8c8d;
+    page-break-inside: avoid;
+}
+
+code {
+    background-color: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+}
+
+pre {
+    background-color: #f4f4f4;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    font-size: 10px;
+    page-break-inside: avoid;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 15px 0;
+    page-break-inside: avoid;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.generated-info {
+    font-size: 10px;
+    color: #666;
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 15px;
+}
+
+a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+ul, ol {
+    padding-left: 25px;
+}
+
+li {
+    margin-bottom: 5px;
+}

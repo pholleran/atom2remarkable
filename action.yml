@@ -1,0 +1,39 @@
+name: 'Atom Feed to PDF Processor'
+description: 'Processes Atom feeds and converts articles to PDF format optimized for reMarkable tablets'
+author: 'Philip Holleran'
+
+branding:
+  icon: 'file-text'
+  color: 'blue'
+
+inputs:
+  recent_hours:
+    description: 'Hours to look back for recent entries'
+    required: false
+    default: '24'
+  feeds_file:
+    description: 'Path to the text file containing Atom feed URLs'
+    required: false
+    default: 'feeds.txt'
+  remarkable_folder:
+    description: 'Folder name in reMarkable Cloud for uploaded PDFs'
+    required: false
+    default: 'AtomFeeds'
+  device_token:
+    description: 'reMarkable device token for authentication'
+    required: true
+
+outputs:
+  pdf_count:
+    description: 'Number of PDF files generated'
+  log_file:
+    description: 'Path to the processing log file'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  env:
+    RECENT_HOURS: ${{ inputs.recent_hours }}
+    FEEDS_FILE: ${{ inputs.feeds_file }}
+    REMARKABLE_FOLDER: ${{ inputs.remarkable_folder }}
+    DEVICE_TOKEN: ${{ inputs.device_token }}

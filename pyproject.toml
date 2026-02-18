@@ -1,0 +1,18 @@
+[project]
+name = "atom2remarkable"
+version = "1.0.0"
+description = "Converts Atom feeds to PDFs and uploads them to reMarkable Cloud"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[tool.coverage.run]
+source = ["config", "main", "remarkable"]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+show_missing = true
