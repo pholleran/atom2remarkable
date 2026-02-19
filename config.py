@@ -29,7 +29,8 @@ class Config:
     
     # Template settings with absolute paths
     TEMPLATE_DIR = os.getenv('TEMPLATE_DIR', os.path.join(APP_ROOT, 'templates'))
-    CSS_FILE = os.getenv('CSS_FILE', os.path.join(APP_ROOT, 'templates', 'style.css'))
+    TEMPLATE_FILE = os.getenv('TEMPLATE_FILE') or ''  # Empty means use article.html from TEMPLATE_DIR
+    CSS_FILE = os.getenv('CSS_FILE') or os.path.join(APP_ROOT, 'templates', 'style.css')
     
     # Date format for filenames and logs
     DATE_FORMAT = '%Y-%m-%d_%H-%M-%S'

@@ -22,6 +22,14 @@ inputs:
   device_token:
     description: 'reMarkable device token for authentication'
     required: true
+  template_file:
+    description: 'Path to a custom Jinja2 HTML template file (defaults to built-in template)'
+    required: false
+    default: ''
+  css_file:
+    description: 'Path to a custom CSS stylesheet file (defaults to built-in stylesheet)'
+    required: false
+    default: ''
 
 outputs:
   pdf_count:
@@ -37,3 +45,5 @@ runs:
     FEEDS_FILE: ${{ inputs.feeds_file }}
     REMARKABLE_FOLDER: ${{ inputs.remarkable_folder }}
     DEVICE_TOKEN: ${{ inputs.device_token }}
+    TEMPLATE_FILE: ${{ inputs.template_file }}
+    CSS_FILE: ${{ inputs.css_file }}
