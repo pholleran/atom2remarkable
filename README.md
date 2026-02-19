@@ -79,6 +79,34 @@ That's it. The workflow will run daily and your reMarkable will stay stocked wit
 | `feeds_file` | Path to your feeds list | `feeds.txt` |
 | `remarkable_folder` | Folder name in reMarkable Cloud | `AtomFeeds` |
 | `recent_hours` | How far back to look for new articles | `24` |
+| `template_file` | Path to a custom Jinja2 HTML template | built-in template |
+| `css_file` | Path to a custom CSS stylesheet | built-in stylesheet |
+
+### Custom templates
+
+By default the action uses its own HTML template and CSS to render articles. You can override either or both by placing your own files in your config repo and pointing the action at them:
+
+```yaml
+- uses: pholleran/atom2remarkable@main
+  with:
+    device_token: ${{ secrets.DEVICE_TOKEN }}
+    template_file: my_template.html  # relative to your repo root
+    css_file: my_style.css
+```
+
+The HTML template is rendered with [Jinja2](https://jinja.palletsprojects.com/) and receives these variables:
+
+| Variable | Description |
+|----------|-------------|
+| `entry_title` | Article title |
+| `feed_title` | Name of the feed |
+| `author` | Article author |
+| `published` | `datetime` of publication |
+| `link` | URL of the original article |
+| `content` | Cleaned HTML body of the article |
+| `generated_date` | `datetime` when the PDF was generated |
+
+See [`templates/article.html`](templates/article.html) and [`templates/style.css`](templates/style.css) for the defaults to use as a starting point.
 
 ## Running Locally
 
@@ -117,6 +145,8 @@ All settings can be overridden with environment variables or CLI flags.
 | `REQUEST_TIMEOUT` | — | `30` |
 | `REMARKABLE_FOLDER` | `--remarkable-folder` | `AtomFeeds` |
 | `RMAPI_PATH` | `--rmapi-path` | `rmapi` |
+| `TEMPLATE_FILE` | — | built-in template |
+| `CSS_FILE` | — | built-in stylesheet |
 
 ## Output
 

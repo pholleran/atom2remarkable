@@ -21,8 +21,16 @@ class AtomFeedProcessor:
         self.setup_logging()
         Config.setup_directories()
         
+        if Config.TEMPLATE_FILE:
+            template_path = Path(Config.TEMPLATE_FILE)
+            template_dir = str(template_path.parent)
+            self.template_name = template_path.name
+        else:
+            template_dir = Config.TEMPLATE_DIR
+            self.template_name = 'article.html'
+
         self.template_env = Environment(
-            loader=FileSystemLoader(Config.TEMPLATE_DIR),
+            loader=FileSystemLoader(template_dir),
             autoescape=select_autoescape(['html', 'xml'])
         )
         
@@ -304,7 +312,7 @@ class AtomFeedProcessor:
         """Generate PDF from entry data. Returns (path, was_skipped)"""
         try:
             # Load template
-            template = self.template_env.get_template('article.html')
+            template = self.template_env.get_template(self.template_name)
             
             # Add published date to entry data
             entry_data['published'] = published_date
